@@ -75,4 +75,12 @@ def login():
     access_token = create_access_token(identity=user.email)
     return jsonify ({'access token':access_token}),200
 
+
+# User Profile view
+@api.route('/users/me', methods=['GET'])
+@jwt_required()
+def profile():
+    email=get_jwt_identity()
+    print('this is the email:',email)
+    return jsonify({'email':email}),200
  

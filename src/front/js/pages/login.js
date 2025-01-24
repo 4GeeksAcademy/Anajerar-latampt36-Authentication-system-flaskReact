@@ -1,10 +1,12 @@
 import React, { useContext, useState } from "react";
+import { Navigate,useNavigate } from "react-router-dom";
 
 const backend=process.env.BACKEND_URL
 
 export const Login = () => {
     //const { store, actions } = useContext(Context);
     const { validEmail, setValidEmail } = useState(true)
+    const navigate = useNavigate()
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -18,11 +20,13 @@ export const Login = () => {
                 body: signUpBody
                 })
             const logInResponse = await response.json();
-            console.log(logInResponse['access token'])
+            const token=logInResponse['access token']
+            localStorage.setItem('token', token);
             if (response.status != 200) {
                 alert(logInResponse.msg)
                 } else {
-                    alert('Login succesfully',logInResponse['access token'])
+                    console.log('login succesfull')
+                    setTimeout(() => navigate('/private'), 2000);
                 }
             
             return
