@@ -3,6 +3,7 @@ import { Context } from "../store/appContext";
 import { Navigate,useNavigate } from "react-router-dom";
 import rigoImageUrl from "../../img/rigo-baby.jpg";
 import "../../styles/home.css";
+import { Navbar } from "../component/navbar";
 
 const backend=process.env.BACKEND_URL
 
@@ -11,23 +12,25 @@ export const Home = () => {
 	const navigate = useNavigate()
 	
 	useEffect(()=>{
-
 		const fetchData = async(token) => {
-            console.log('going into fetching data');
             const response = await fetch(`${backend}api/users/me`,{
                 headers : {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
                   }            })
-			if (response.code != 200) {
+			if (response.status != 200) {
 				localStorage.removeItem('token');
+				store.whereiam='Login';
 				navigate('/login')
-			} else { navigate('/private')}
+			} else {
+					store.whereiam='Private';
+					navigate('/private')}
 				}
-
+		store.whereiam='Home';
 		const token=localStorage.getItem('token',token);
 		if (!token) {
-			navigate('/login')
+				store.whereiam='Login';
+				navigate('/login')
 		}
 		fetchData(token);
 		return
@@ -36,6 +39,7 @@ export const Home = () => {
 
 	return (
 		<div className="text-center mt-5">
+			<Navbar />
 			<h1>Hello Rigo!!</h1>
 			<p>
 				<img src={rigoImageUrl} />

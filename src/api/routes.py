@@ -29,17 +29,17 @@ def handle_hello():
 def sign_in():
     data = request.json
 
+    user_name = data.get("user_name")
     email = data.get("email")
     password = data.get("password")
 
     user_exist = db.session.execute(db.select(User).filter_by(email=email)).one_or_none()
     if user_exist==None:
-        print('Email: ',email,' Password: ',password)
         password_hash = generate_password_hash(password)
 
         new_user = User(
+            user_name = user_name,
             email=email,
-            #password=password
             password_hash=password_hash,
             
         )
@@ -49,7 +49,6 @@ def sign_in():
             db.session.commit()
         except Exception as error:
             db.session.rollback()
-            print("Database error:", error)
             return jsonify({"message": "Error saving user to database"}), 500
 
         return jsonify({
@@ -57,7 +56,7 @@ def sign_in():
             "message": "Registration completed successfully, you will be redirected to the Log-in"
         }), 200
     else:
-        return jsonify({"msg":"email already registered"}),400
+        return jsonify({"msg":"Credenciales de usuario ya existente, intenta de nuevo"}),400
 
 @api.route('/login', methods=['POST'])
 def login():
@@ -81,6 +80,7 @@ def login():
 @jwt_required()
 def profile():
     email=get_jwt_identity()
-    print('this is the email:',email)
-    return jsonify({'email':email}),200
+    user_exist = db.session.execute(db.select(User).filter_by(email=email)).one_or_none()
+    return jsonify(user_exist[0].serialize()),200
+
  
